@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ludi Kullanıcı Paneli</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Şirket Bazında Toplam Kullanıcı Sayısı</h1>
+        <div class="table-responsive">
+            {% for table in tables %}
+                {{ table|safe }}
+            {% endfor %}
+        </div>
+        <h1>Günlük Toplam Kullanıcı Sayısının Gelişimi</h1>
+        <div id="user-growth-plot" class="shadow-lg p-3 mb-5 bg-white rounded"></div>
+    </div>
+    <script>
+        const userGrowthData = {{ daily_user_counts | tojson }};
+        var trace = {
+            x: userGrowthData.dates,
+            y: userGrowthData.counts,
+            mode: 'lines+markers',
+            type: 'scatter',
+            marker: { color: '#007bff' },
+            line: { color: '#007bff' }
+        };
+        var data = [trace];
+        var layout = {
+            title: 'Günlük Toplam Kullanıcı Sayısı',
+            xaxis: { title: 'Tarih' },
+            yaxis: { title: 'Toplam Kullanıcı Sayısı' },
+            plot_bgcolor: '#f4f4f4',
+            paper_bgcolor: '#fff',
+            font: { color: '#333' }
+        };
+        Plotly.newPlot('user-growth-plot', data, layout);
+    </script>
+</body>
+</html>
