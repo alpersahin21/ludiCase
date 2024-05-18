@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
     <title>Ludi Kullanıcı Paneli</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -15,28 +16,52 @@
             {% endfor %}
         </div>
         <h1>Günlük Toplam Kullanıcı Sayısının Gelişimi</h1>
-        <div id="user-growth-plot" class="shadow-lg p-3 mb-5 bg-white rounded"></div>
+        <div id="user-growth-plot" style="width: 100%; height: 500px;"></div>
     </div>
     <script>
-        const userGrowthData = {{ daily_user_counts | tojson }};
-        var trace = {
-            x: userGrowthData.dates,
-            y: userGrowthData.counts,
-            mode: 'lines+markers',
-            type: 'scatter',
-            marker: { color: '#007bff' },
-            line: { color: '#007bff' }
-        };
-        var data = [trace];
-        var layout = {
-            title: 'Günlük Toplam Kullanıcı Sayısı',
-            xaxis: { title: 'Tarih' },
-            yaxis: { title: 'Toplam Kullanıcı Sayısı' },
-            plot_bgcolor: '#f4f4f4',
-            paper_bgcolor: '#fff',
-            font: { color: '#333' }
-        };
-        Plotly.newPlot('user-growth-plot', data, layout);
+        document.addEventListener('DOMContentLoaded', function() {
+            const userGrowthData = JSON.parse('{{ daily_user_counts | tojson | safe }}');
+            const trace = {
+                x: userGrowthData.dates,
+                y: userGrowthData.counts,
+                mode: 'lines+markers',
+                type: 'scatter',
+                marker: { color: '#007bff' },
+                line: { color: '#007bff' }
+            };
+            const data = [trace];
+            const layout = {
+                title: 'Günlük Toplam Kullanıcı Sayısı',
+                xaxis: {
+                    title: {
+                        text: 'Tarih',
+                        standoff: 20  // Add extra space between the title and axis
+                    },
+                    tickangle: -45,  // Rotate x-axis labels for better readability
+                    automargin: true  // Automatically adjust margins
+                },
+                yaxis: {
+                    title: {
+                        text: 'Toplam Kullanıcı Sayısı',
+                        standoff: 10  // Add extra space between the title and axis
+                    },
+                    automargin: true  // Automatically adjust margins
+                },
+                plot_bgcolor: '#f4f4f4',
+                paper_bgcolor: '#fff',
+                font: { color: '#333' },
+                margin: { l: 60, r: 20, b: 100, t: 60, pad: 4 }  // Adjust margins
+            };
+            Plotly.newPlot('user-growth-plot', data, layout);
+
+            // Ensure the plot resizes correctly when the window size changes
+            window.onresize = function() {
+                Plotly.relayout('user-growth-plot', {
+                    width: document.getElementById('user-growth-plot').clientWidth,
+                    height: document.getElementById('user-growth-plot').clientHeight
+                });
+            };
+        });
     </script>
 </body>
 </html>
